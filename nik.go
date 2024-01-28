@@ -77,3 +77,30 @@ func generateNIK(gender string, tahun int, bulan int, jumlah int) []string {
 
 	return arrayNik
 }
+
+func generateNIKLanjutan(lastNik string, jumlah int) ([]string, error) {
+	if jumlah < 1 {
+		return nil, errors.New("error: jumlah minimal 1")
+	}
+
+	nikOrigianlArr := strings.Split(lastNik, "-")
+	if len(nikOrigianlArr) != 2 {
+		return nil, errors.New("error: NIK malformed")
+	}
+
+	prefixNik := nikOrigianlArr[0]
+	offsetNik := nikOrigianlArr[1]
+
+	offset, err := strconv.Atoi(offsetNik)
+	if err != nil {
+		return nil, err
+	}
+
+	arrayNik := make([]string, jumlah)
+	for i := 0; i < jumlah; i++ {
+		arrayNik[i] = fmt.Sprintf("%v-%05d", prefixNik, offset+i+1)
+	}
+	fmt.Println(arrayNik)
+
+	return arrayNik, nil
+}

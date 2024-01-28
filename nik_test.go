@@ -138,3 +138,55 @@ func TestGenerateNIKIkhwan(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateNIKLanjutanValid(t *testing.T) {
+	expected := []string{
+		"ARN201-00036",
+		"ARN201-00037",
+		"ARN201-00038",
+	}
+
+	result, err := generateNIKLanjutan("ARN201-00035", 3)
+
+	if err != nil {
+		t.Fatalf("generateNIKLanjutan, result=%v, expected=%v, err=%v", result, expected, err)
+	}
+
+	for i := range result {
+		if result[i] != expected[i] {
+			t.Fatalf("generateNIKLanjutan, result=%v, expected=%v", result, expected)
+		}
+	}
+}
+
+func TestGenerateNIKLanjutanNIKInvalidNoSeparator(t *testing.T) {
+	result, err := generateNIKLanjutan("ARN20100035", 3)
+
+	if err == nil {
+		t.Fatalf("generateNIKLanjutan, result=%v, err=%v", result, err)
+	}
+}
+
+func TestGenerateNIKLanjutanNIKInvalidNonInteger(t *testing.T) {
+	result, err := generateNIKLanjutan("ARN201-abcde", 3)
+
+	if err == nil {
+		t.Fatalf("generateNIKLanjutan, result=%v, err=%v", result, err)
+	}
+}
+
+func TestGenerateNIKLanjutanGenerateZero(t *testing.T) {
+	result, err := generateNIKLanjutan("ARN201-00035", 0)
+
+	if err == nil {
+		t.Fatalf("generateNIKLanjutan, result=%v, err=%v", result, err)
+	}
+}
+
+func TestGenerateNIKLanjutanGenerateMinus(t *testing.T) {
+	result, err := generateNIKLanjutan("ARN201-00035", -5)
+
+	if err == nil {
+		t.Fatalf("generateNIKLanjutan, result=%v, err=%v", result, err)
+	}
+}

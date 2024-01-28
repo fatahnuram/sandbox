@@ -28,4 +28,5 @@ func main() {
 
 	/* Level 2 */
 	generateNIK("akhwat", 2025, 2, 3)
+	generateNIKLanjutan("ARN201-00035", 3)
 }
