@@ -1,86 +1,51 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
-var db *sql.DB
-
 func main() {
-	// fmt.Println("Hello, world!")
-
-	// /* Level 1 */
-	// /* contoh Println vs Sprintln */
-
-	// // Println
-	// fmt.Println("Example of Println function.")
-
-	// // Sprintln (tapi tidak di-print)
-	// fmt.Sprintln("Example of Sprintln function.")
-	// // Sprintln (dan di-print)
-	// s := fmt.Sprintln("Another example of Sprintln function.")
-	// io.WriteString(os.Stdout, s)
-
-	// /* contoh fmt.Errorf vs errors.New */
-
-	// // fmt.Errorf
-	// errcontent := "contoh dynamic error msg"
-	// err := fmt.Errorf("example Errorf msg: %s", errcontent)
-	// fmt.Println(err)
-
-	// // errors.New
-	// err2 := errors.New("example errors.New for static error msg")
-	// fmt.Println(err2)
-
-	// /* Level 2 */
-	// generateNIK("akhwat", 2025, 2, 3)
-	// generateNIKLanjutan("ARN201-00035", 3)
-
-	/* Tutorial SQL */
-	cfg := mysql.Config{
+	config := mysql.Config{
 		User:   os.Getenv("DBUSER"),
 		Passwd: os.Getenv("DBPASS"),
+		DBName: os.Getenv("DBNAME"),
 		Net:    "tcp",
 		Addr:   "127.0.0.1:3306",
-		DBName: "recordings",
 	}
 
-	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err := sqlx.Connect("mysql", config.FormatDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Connected to db.")
 
-	pingErr := db.Ping()
-	if pingErr != nil {
-		log.Fatal(pingErr)
-	}
-	fmt.Println("Connected!")
-
-	albums, err := albumsByArtist("John Coltrane")
+	// insert to department
+	dep := Department{Name: "IT"}
+	depId, err := insertDepartmentAndReturnId(db, dep)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Albums found: %v\n", albums)
+	fmt.Printf("New department ID: %d\n", depId)
 
-	alb, err := albumById(3)
+	// insert to employee
+	empl := Employee{Name: "Putra", DepId: depId}
+	emplId, err := insertEmployeeAndReturnId(db, empl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Album found: %v\n", alb)
+	fmt.Printf("New employee ID: %d\n", emplId)
 
-	albId, err := addAlbum(Album{
-		Title:  "The Modern Sound of Betty Carter",
-		Artist: "Betty Carter",
-		Price:  49.99,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("ID of added album: %v\n", albId)
+	// TODO: get department
+	// TODO: get employee
+
+	// TODO: update department
+	// TODO: update employee
+
+	// TODO: delete department
+	// TODO: delete employee
 }

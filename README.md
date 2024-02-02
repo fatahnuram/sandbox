@@ -2,7 +2,7 @@
 
 HSI Sandbox #3 Golang track.
 
-## How to
+## Level 3, how to
 
 Run dev database using `mysql:8.0` image:
 
@@ -13,9 +13,20 @@ docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password mysql:
 Access the database container:
 
 ```bash
-docker exec -it mysqldb sh
-# or
 docker exec -it mysqldb mysql -u root -ppassword
+```
+
+Create initial database name:
+
+```sql
+CREATE DATABASE dbname;
+USE dbname;
+```
+
+Apply database schema:
+
+```bash
+# copy paste content from `hsi-sandbox-lv3.sql` inside `sql` dir.
 ```
 
 Build the app:
@@ -24,10 +35,16 @@ Build the app:
 go build .
 ```
 
-Run the app:
+Export necessary configs:
 
 ```bash
 export DBUSER=root
 export DBPASS=password
+export DBNAME=dbname
+```
+
+Run the app:
+
+```bash
 ./sandbox
 ```
