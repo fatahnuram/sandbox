@@ -104,6 +104,6 @@ func printAllEmpl(db *sqlx.DB) error {
 	if err := db.Select(&empls, "select * from employee"); err != nil {
 		return err
 	}
-	fmt.Printf("All departments: %v\n", empls)
+	fmt.Printf("All employees: %v\n", empls)
 	return nil
 }

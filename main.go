@@ -97,4 +97,10 @@ func main() {
 	// tx demo assign empl to new dept
 	fmt.Println("\n======= Demo Transaction Assign Empl to new Dept")
 	txDemoAssign(db)
+
+	fmt.Println("\n======= Demo Batch Insert 1 Dept 2 Empl")
+	batchDemoOneDeptTwoEmployees(db)
+
+	fmt.Println("\n======= Demo Batch Insert Assign Empl to new Dept")
+	batchDemoAssignEmployee(db)
 }
