@@ -89,7 +89,12 @@ func main() {
 	fmt.Printf("Deleted department: %v\n", deletedDept)
 
 	// tx 1 dept 2 empl
+	fmt.Println("\n======= Demo Transaction 1 Dept 2 Empl")
 	txOneDeptTwoEmpl(db)
 	printAllDept(db)
 	printAllEmpl(db)
+
+	// tx demo assign empl to new dept
+	fmt.Println("\n======= Demo Transaction Assign Empl to new Dept")
+	txDemoAssign(db)
 }
