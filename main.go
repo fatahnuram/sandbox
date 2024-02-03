@@ -24,6 +24,7 @@ func main() {
 	}
 	fmt.Println("Connected to db.")
 
+	fmt.Println("\n======= Demo Insert")
 	// insert to department
 	dep := Department{Name: "IT"}
 	depId, err := insertDepartmentAndReturnId(db, dep)
@@ -40,6 +41,7 @@ func main() {
 	}
 	fmt.Printf("New employee ID: %d\n", emplId)
 
+	fmt.Println("\n======= Demo Retrieve")
 	// get department
 	depIT, err := getDepartmentById(db, depId)
 	if err != nil {
@@ -54,6 +56,7 @@ func main() {
 	}
 	fmt.Printf("Employee with ID %d: %v\n", myEmployee.Id, myEmployee)
 
+	fmt.Println("\n======= Demo Update")
 	// update department
 	updateDepartmentNameById(db, depId, "Tech")
 	depIT, err = getDepartmentById(db, depId)
@@ -70,6 +73,7 @@ func main() {
 	}
 	fmt.Printf("Updated employee, ID: %d, obj: %v\n", myEmployee.Id, myEmployee)
 
+	fmt.Println("\n======= Demo Update")
 	// delete employee
 	deletedEmployee, err := deleteAndReturnEmployeeById(db, emplId)
 	if err != nil {
