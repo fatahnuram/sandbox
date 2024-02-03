@@ -40,12 +40,47 @@ func main() {
 	}
 	fmt.Printf("New employee ID: %d\n", emplId)
 
-	// TODO: get department
-	// TODO: get employee
+	// get department
+	depIT, err := getDepartmentById(db, depId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Department with ID %d: %v\n", depIT.Id, depIT)
 
-	// TODO: update department
-	// TODO: update employee
+	// get employee
+	myEmployee, err := getEmployeeById(db, emplId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Employee with ID %d: %v\n", myEmployee.Id, myEmployee)
 
-	// TODO: delete department
-	// TODO: delete employee
+	// update department
+	updateDepartmentNameById(db, depId, "Tech")
+	depIT, err = getDepartmentById(db, depId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Updated department, ID: %d, obj: %v\n", depIT.Id, depIT)
+
+	// update employee
+	updateEmployeeNameById(db, emplId, "Kamaludin")
+	myEmployee, err = getEmployeeById(db, emplId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Updated employee, ID: %d, obj: %v\n", myEmployee.Id, myEmployee)
+
+	// delete employee
+	deletedEmployee, err := deleteAndReturnEmployeeById(db, emplId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Deleted employee: %v\n", deletedEmployee)
+
+	// delete department
+	deletedDept, err := deleteAndReturnDepartmentById(db, depId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Deleted department: %v\n", deletedDept)
 }
