@@ -1,7 +1,14 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
+)
+
+const (
+	NAMEDQUERY_INSERT_DEPT        = "insert into department (name) values (:name)"
+	NAMEDQUERY_INSERT_EMPL_DEPTID = "insert into employee (name, department_id) values (:name, :department_id)"
 )
 
 type Department struct {
@@ -16,7 +23,7 @@ type Employee struct {
 }
 
 func insertDepartmentAndReturnId(db *sqlx.DB, dep Department) (int64, error) {
-	res, err := db.NamedExec("insert into department (name) values (:name)", dep)
+	res, err := db.NamedExec(NAMEDQUERY_INSERT_DEPT, dep)
 	if err != nil {
 		return 0, err
 	}
@@ -28,7 +35,7 @@ func insertDepartmentAndReturnId(db *sqlx.DB, dep Department) (int64, error) {
 }
 
 func insertEmployeeAndReturnId(db *sqlx.DB, empl Employee) (int64, error) {
-	res, err := db.NamedExec("insert into employee (name, department_id) values (:name, :department_id)", empl)
+	res, err := db.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, empl)
 	if err != nil {
 		return 0, err
 	}
@@ -81,4 +88,101 @@ func deleteAndReturnEmployeeById(db *sqlx.DB, id int64) (Employee, error) {
 	}
 	db.MustExec("delete from employee where id = ?", id)
 	return empl, nil
+}
+
+func printAllDept(db *sqlx.DB) error {
+	var deps []Department
+	if err := db.Select(&deps, "select * from department"); err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	return nil
+}
+
+func printAllEmpl(db *sqlx.DB) error {
+	var empls []Employee
+	if err := db.Select(&empls, "select * from employee"); err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", empls)
+	return nil
+}
+
+func txOneDeptTwoEmpl(db *sqlx.DB) error {
+	// define obj to insert
+	sales := Department{Name: "Sales"}
+	john, carlos := Employee{Name: "John"}, Employee{Name: "Carlos"}
+
+	// begin trx
+	tx := db.MustBegin()
+
+	// insert dept
+	res, err := tx.NamedExec(NAMEDQUERY_INSERT_DEPT, sales)
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	salesDepId, err := res.LastInsertId()
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	sales.Id = salesDepId
+
+	// insert empl 1
+	john.DepId = salesDepId
+	res, err = tx.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, john)
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	johnId, err := res.LastInsertId()
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	john.Id = johnId
+
+	// insert empl 2
+	carlos.DepId = salesDepId
+	res, err = tx.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, carlos)
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	carlosId, err := res.LastInsertId()
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+	carlos.Id = carlosId
+
+	// commit trx
+	if err = tx.Commit(); err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			return rollbackErr
+		}
+		return err
+	}
+
+	return nil
 }

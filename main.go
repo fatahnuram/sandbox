@@ -87,4 +87,9 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Deleted department: %v\n", deletedDept)
+
+	// tx 1 dept 2 empl
+	txOneDeptTwoEmpl(db)
+	printAllDept(db)
+	printAllEmpl(db)
 }
