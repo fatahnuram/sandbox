@@ -34,3 +34,21 @@ func listAllEmployees(resp http.ResponseWriter, req *http.Request) {
 		}
 	}
 }
+
+func listAllDepartments(resp http.ResponseWriter, req *http.Request) {
+	depts, err := model.ListAllDepartments()
+	if err != nil {
+		log.Printf("[ERROR] %v", err)
+		resp.WriteHeader(http.StatusInternalServerError)
+		resp.Write([]byte(SOMETHING_WENT_WRONG))
+	} else {
+		deptbytes, err := json.Marshal(depts)
+		if err != nil {
+			log.Printf("[ERROR] %v", err)
+			resp.WriteHeader(http.StatusInternalServerError)
+			resp.Write([]byte(SOMETHING_WENT_WRONG))
+		} else {
+			resp.Write([]byte(deptbytes))
+		}
+	}
+}
