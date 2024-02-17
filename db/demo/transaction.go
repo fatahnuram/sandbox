@@ -1,17 +1,21 @@
-package main
+package demo
 
-import "github.com/jmoiron/sqlx"
+import (
+	model "github.com/fatahnuram/sandbox/db"
+	"github.com/jmoiron/sqlx"
+)
 
 func txOneDeptTwoEmpl(db *sqlx.DB) error {
 	// define obj to insert
-	sales := Department{Name: "Sales"}
-	john, carlos := Employee{Name: "John"}, Employee{Name: "Carlos"}
+
+	sales := model.Department{Name: "Sales"}
+	john, carlos := model.Employee{Name: "John"}, model.Employee{Name: "Carlos"}
 
 	// begin trx
 	tx := db.MustBegin()
 
 	// insert dept
-	res, err := tx.NamedExec(NAMEDQUERY_INSERT_DEPT, sales)
+	res, err := tx.NamedExec(model.NAMEDQUERY_INSERT_DEPT, sales)
 	if err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
@@ -31,7 +35,7 @@ func txOneDeptTwoEmpl(db *sqlx.DB) error {
 
 	// insert empl 1
 	john.DepId = salesDepId
-	res, err = tx.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, john)
+	res, err = tx.NamedExec(model.NAMEDQUERY_INSERT_EMPL_DEPTID, john)
 	if err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
@@ -51,7 +55,7 @@ func txOneDeptTwoEmpl(db *sqlx.DB) error {
 
 	// insert empl 2
 	carlos.DepId = salesDepId
-	res, err = tx.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, carlos)
+	res, err = tx.NamedExec(model.NAMEDQUERY_INSERT_EMPL_DEPTID, carlos)
 	if err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
@@ -83,28 +87,28 @@ func txOneDeptTwoEmpl(db *sqlx.DB) error {
 
 func txDemoAssign(db *sqlx.DB) error {
 	// define initial
-	finance, biz := Department{Name: "Finance"}, Department{Name: "Business"}
-	denis, gerry := Employee{Name: "Denis"}, Employee{Name: "Gerry"} // initial: denis -> finance, gerry -> biz
+	finance, biz := model.Department{Name: "Finance"}, model.Department{Name: "Business"}
+	denis, gerry := model.Employee{Name: "Denis"}, model.Employee{Name: "Gerry"} // initial: denis -> finance, gerry -> biz
 
 	// insert data without trx
-	financeId, err := insertDepartmentAndReturnId(db, finance)
+	financeId, err := model.InsertDepartmentAndReturnId(db, finance)
 	if err != nil {
 		return err
 	}
 	finance.Id = financeId
 	denis.DepId = financeId
-	denisId, err := insertEmployeeAndReturnId(db, denis)
+	denisId, err := model.InsertEmployeeAndReturnId(db, denis)
 	if err != nil {
 		return err
 	}
 	denis.Id = denisId
 
-	printAllDept(db)
-	printAllEmpl(db)
+	model.PrintAllDept(db)
+	model.PrintAllEmpl(db)
 
 	// insert dept with trx
 	tx := db.MustBegin()
-	res, err := tx.NamedExec(NAMEDQUERY_INSERT_DEPT, biz)
+	res, err := tx.NamedExec(model.NAMEDQUERY_INSERT_DEPT, biz)
 	if err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
@@ -124,7 +128,7 @@ func txDemoAssign(db *sqlx.DB) error {
 
 	// insert employee with trx
 	gerry.DepId = bizId
-	res, err = tx.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, gerry)
+	res, err = tx.NamedExec(model.NAMEDQUERY_INSERT_EMPL_DEPTID, gerry)
 	if err != nil {
 		rollbackErr := tx.Rollback()
 		if rollbackErr != nil {
@@ -162,8 +166,8 @@ func txDemoAssign(db *sqlx.DB) error {
 		return err
 	}
 
-	printAllDept(db)
-	printAllEmpl(db)
+	model.PrintAllDept(db)
+	model.PrintAllEmpl(db)
 
 	return nil
 }

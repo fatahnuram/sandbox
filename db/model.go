@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ type Employee struct {
 	DepId int64 `db:"department_id"`
 }
 
-func insertDepartmentAndReturnId(db *sqlx.DB, dep Department) (int64, error) {
+func InsertDepartmentAndReturnId(db *sqlx.DB, dep Department) (int64, error) {
 	res, err := db.NamedExec(NAMEDQUERY_INSERT_DEPT, dep)
 	if err != nil {
 		return 0, err
@@ -34,7 +34,7 @@ func insertDepartmentAndReturnId(db *sqlx.DB, dep Department) (int64, error) {
 	return id, nil
 }
 
-func insertEmployeeAndReturnId(db *sqlx.DB, empl Employee) (int64, error) {
+func InsertEmployeeAndReturnId(db *sqlx.DB, empl Employee) (int64, error) {
 	res, err := db.NamedExec(NAMEDQUERY_INSERT_EMPL_DEPTID, empl)
 	if err != nil {
 		return 0, err
@@ -90,7 +90,7 @@ func deleteAndReturnEmployeeById(db *sqlx.DB, id int64) (Employee, error) {
 	return empl, nil
 }
 
-func printAllDept(db *sqlx.DB) error {
+func PrintAllDept(db *sqlx.DB) error {
 	var deps []Department
 	if err := db.Select(&deps, "select * from department"); err != nil {
 		return err
@@ -99,7 +99,7 @@ func printAllDept(db *sqlx.DB) error {
 	return nil
 }
 
-func printAllEmpl(db *sqlx.DB) error {
+func PrintAllEmpl(db *sqlx.DB) error {
 	var empls []Employee
 	if err := db.Select(&empls, "select * from employee"); err != nil {
 		return err
