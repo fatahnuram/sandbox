@@ -1,7 +1,6 @@
 package http
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -9,46 +8,37 @@ import (
 )
 
 func homepage(resp http.ResponseWriter, req *http.Request) {
+	// TODO: create test
 	resp.Write([]byte("Welcome.\n"))
 }
 
 func healthz(resp http.ResponseWriter, req *http.Request) {
+	// TODO: create test
 	resp.Write([]byte("ok\n"))
 }
 
+// listAllEmployees list or get employees based on request path
 func listAllEmployees(resp http.ResponseWriter, req *http.Request) {
-	employees, err := model.ListAllEmployees()
-	if err != nil {
-		log.Printf("[ERROR] %v", err)
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(SOMETHING_WENT_WRONG))
+	path := parsePathParameter(req.URL.Path)
+	if len(path) == 1 {
+		log.Println("list employees")
+		employees, err := model.ListAllEmployees()
+		wrapJsonResponse(resp, err, employees)
 	} else {
-		emplbytes, err := json.Marshal(employees)
-		if err != nil {
-			log.Printf("[ERROR] %v", err)
-			resp.WriteHeader(http.StatusInternalServerError)
-			resp.Write([]byte(SOMETHING_WENT_WRONG))
-		} else {
-			resp.Header().Set("content-type", "application/json")
-			resp.Write([]byte(emplbytes))
-		}
+		log.Println("get employee by ID")
+		wrapJsonResponse(resp, nil, MsgPlaceholder{Msg: "wip"})
 	}
 }
 
+// listAllDepartments list or get departments based on request path
 func listAllDepartments(resp http.ResponseWriter, req *http.Request) {
-	depts, err := model.ListAllDepartments()
-	if err != nil {
-		log.Printf("[ERROR] %v", err)
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte(SOMETHING_WENT_WRONG))
+	path := parsePathParameter(req.URL.Path)
+	if len(path) == 1 {
+		log.Println("list departments")
+		depts, err := model.ListAllDepartments()
+		wrapJsonResponse(resp, err, depts)
 	} else {
-		deptbytes, err := json.Marshal(depts)
-		if err != nil {
-			log.Printf("[ERROR] %v", err)
-			resp.WriteHeader(http.StatusInternalServerError)
-			resp.Write([]byte(SOMETHING_WENT_WRONG))
-		} else {
-			resp.Write([]byte(deptbytes))
-		}
+		log.Println("get department by ID")
+		wrapJsonResponse(resp, nil, MsgPlaceholder{Msg: "wip"})
 	}
 }
