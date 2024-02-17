@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -90,20 +88,26 @@ func deleteAndReturnEmployeeById(db *sqlx.DB, id int64) (Employee, error) {
 	return empl, nil
 }
 
-func PrintAllDept(db *sqlx.DB) error {
+func ListAllDepartments() ([]Department, error) {
 	var deps []Department
-	if err := db.Select(&deps, "select * from department"); err != nil {
-		return err
+	db, err := GetDBConnection()
+	if err != nil {
+		return nil, err
 	}
-	fmt.Printf("All departments: %v\n", deps)
-	return nil
+	if err = db.Select(&deps, "select * from department"); err != nil {
+		return nil, err
+	}
+	return deps, nil
 }
 
-func PrintAllEmpl(db *sqlx.DB) error {
+func ListAllEmployees() ([]Employee, error) {
 	var empls []Employee
-	if err := db.Select(&empls, "select * from employee"); err != nil {
-		return err
+	db, err := GetDBConnection()
+	if err != nil {
+		return nil, err
 	}
-	fmt.Printf("All employees: %v\n", empls)
-	return nil
+	if err := db.Select(&empls, "select * from employee"); err != nil {
+		return nil, err
+	}
+	return empls, nil
 }

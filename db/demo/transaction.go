@@ -1,6 +1,8 @@
 package demo
 
 import (
+	"fmt"
+
 	model "github.com/fatahnuram/sandbox/db"
 	"github.com/jmoiron/sqlx"
 )
@@ -103,8 +105,16 @@ func txDemoAssign(db *sqlx.DB) error {
 	}
 	denis.Id = denisId
 
-	model.PrintAllDept(db)
-	model.PrintAllEmpl(db)
+	deps, err := model.ListAllDepartments()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	employees, err := model.ListAllEmployees()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All employees: %v\n", employees)
 
 	// insert dept with trx
 	tx := db.MustBegin()
@@ -166,8 +176,16 @@ func txDemoAssign(db *sqlx.DB) error {
 		return err
 	}
 
-	model.PrintAllDept(db)
-	model.PrintAllEmpl(db)
+	deps, err = model.ListAllDepartments()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	employees, err = model.ListAllEmployees()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All employees: %v\n", employees)
 
 	return nil
 }

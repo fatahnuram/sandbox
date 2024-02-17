@@ -1,6 +1,8 @@
 package demo
 
 import (
+	"fmt"
+
 	model "github.com/fatahnuram/sandbox/db"
 	"github.com/jmoiron/sqlx"
 )
@@ -26,8 +28,16 @@ func batchDemoOneDeptTwoEmployees(db *sqlx.DB) error {
 		return err
 	}
 
-	model.PrintAllDept(db)
-	model.PrintAllEmpl(db)
+	deps, err := model.ListAllDepartments()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	employees, err := model.ListAllEmployees()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All employees: %v\n", employees)
 
 	return nil
 }
@@ -54,8 +64,16 @@ func batchDemoAssignEmployee(db *sqlx.DB) error {
 		return err
 	}
 
-	model.PrintAllDept(db)
-	model.PrintAllEmpl(db)
+	deps, err := model.ListAllDepartments()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	employees, err := model.ListAllEmployees()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All employees: %v\n", employees)
 
 	// create another dept
 	adminId, err := model.InsertDepartmentAndReturnId(db, admin)
@@ -67,8 +85,16 @@ func batchDemoAssignEmployee(db *sqlx.DB) error {
 	// assign to other dept
 	db.MustExec("update employee set department_id = ? where department_id = ?", admin.Id, corp.Id)
 
-	model.PrintAllDept(db)
-	model.PrintAllEmpl(db)
+	deps, err = model.ListAllDepartments()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All departments: %v\n", deps)
+	employees, err = model.ListAllEmployees()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("All employees: %v\n", employees)
 
 	return nil
 }

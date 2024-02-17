@@ -1,9 +1,13 @@
 package db
 
 import (
+	"errors"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
+
+var DbConn *sqlx.DB = nil
 
 func InitializeMysql(host, user, password, dbName, netProto string) (*sqlx.DB, error) {
 	config := mysql.Config{
@@ -19,5 +23,14 @@ func InitializeMysql(host, user, password, dbName, netProto string) (*sqlx.DB, e
 		return nil, err
 	}
 
+	DbConn = db
 	return db, nil
+}
+
+func GetDBConnection() (*sqlx.DB, error) {
+	if DbConn == nil {
+		return nil, errors.New("database not initialized")
+	}
+
+	return DbConn, nil
 }
