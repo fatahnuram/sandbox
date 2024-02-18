@@ -25,7 +25,19 @@ func getEmployees(resp http.ResponseWriter, req *http.Request) {
 		wrapJsonResponse(resp, err, employees)
 	} else {
 		log.Println("get employee by ID")
-		wrapJsonResponse(resp, nil, MsgPlaceholder{Msg: "wip"})
+
+		param := path[1]
+		id, err := strconv.Atoi(param)
+		if err != nil {
+			log.Printf("[ERROR] convert to int: %v", err)
+			msg := ErrorMsg{Error: true, Msg: INVALID_ID}
+			sendResponse(resp, http.StatusBadRequest, msg)
+			return
+		}
+		id64 := int64(id)
+
+		empl, err := model.GetEmployeeById(id64)
+		wrapJsonResponse(resp, err, empl)
 	}
 }
 
