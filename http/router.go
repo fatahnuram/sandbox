@@ -5,7 +5,6 @@ import (
 )
 
 func InitRoutes() http.Handler {
-	// TODO: create tests
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", homepage)
 	mux.HandleFunc("/healthz", healthz)
