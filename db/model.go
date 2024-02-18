@@ -89,10 +89,23 @@ func deleteAndReturnDepartmentById(id int64) (Department, error) {
 	}
 	db, err := GetDBConnection()
 	if err != nil {
-		return Department{}, nil
+		return Department{}, err
 	}
 	db.MustExec("delete from department where id = ?", id)
 	return dep, nil
+}
+
+func DeleteEmployeeById(id int64) (int64, error) {
+	db, err := GetDBConnection()
+	if err != nil {
+		return -1, err
+	}
+	result := db.MustExec("delete from employee where id = ?", id)
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+	return rows, nil
 }
 
 func deleteAndReturnEmployeeById(id int64) (Employee, error) {
@@ -102,7 +115,7 @@ func deleteAndReturnEmployeeById(id int64) (Employee, error) {
 	}
 	db, err := GetDBConnection()
 	if err != nil {
-		return Employee{}, nil
+		return Employee{}, err
 	}
 	db.MustExec("delete from employee where id = ?", id)
 	return empl, nil

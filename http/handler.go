@@ -16,16 +16,20 @@ func healthz(resp http.ResponseWriter, req *http.Request) {
 	resp.Write([]byte("ok\n"))
 }
 
-// listAllEmployees list or get employees based on request path
-func getEmployees(resp http.ResponseWriter, req *http.Request) {
+// handleEmployees handle employees CRUD based on request method and path
+func handleEmployees(resp http.ResponseWriter, req *http.Request) {
 	path := parsePathParameter(req.URL.Path)
 	if len(path) == 1 {
-		log.Println("list employees")
-		employees, err := model.ListAllEmployees()
-		wrapJsonResponse(resp, err, employees)
-	} else {
-		log.Println("get employee by ID")
+		switch req.Method {
+		case http.MethodGet:
+			log.Println("list employees")
+			employees, err := model.ListAllEmployees()
+			wrapJsonResponse(resp, err, employees)
 
+		default:
+			handleUnsupportedRoute(resp, req)
+		}
+	} else {
 		param := path[1]
 		id, err := strconv.Atoi(param)
 		if err != nil {
@@ -36,13 +40,38 @@ func getEmployees(resp http.ResponseWriter, req *http.Request) {
 		}
 		id64 := int64(id)
 
-		empl, err := model.GetEmployeeById(id64)
-		wrapJsonResponse(resp, err, empl)
+		switch req.Method {
+		case http.MethodGet:
+			log.Println("get employee by ID")
+			empl, err := model.GetEmployeeById(id64)
+			wrapJsonResponse(resp, err, empl)
+
+		case http.MethodDelete:
+			log.Println("delete employee by ID")
+			rows, err := model.DeleteEmployeeById(id64)
+			if err != nil {
+				log.Printf("[ERROR] server resp: %v", err)
+				msg := ErrorMsg{Error: true, Msg: SOMETHING_WENT_WRONG}
+				sendResponse(resp, http.StatusInternalServerError, msg)
+				return
+			}
+			if rows == 0 {
+				log.Print("[WARN] not found")
+				msg := ErrorMsg{Error: false, Msg: NOT_FOUND}
+				sendResponse(resp, http.StatusNotFound, msg)
+				return
+			}
+			msg := MsgPlaceholder{Msg: RESOURCE_DELETED}
+			sendResponse(resp, http.StatusOK, msg)
+
+		default:
+			handleUnsupportedRoute(resp, req)
+		}
 	}
 }
 
-// listAllDepartments list or get departments based on request path
-func getDepartments(resp http.ResponseWriter, req *http.Request) {
+// handleDepartments handle departments CRUD based on request method and path
+func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 	path := parsePathParameter(req.URL.Path)
 	if len(path) == 1 {
 		log.Println("list departments")

@@ -78,3 +78,9 @@ func wrapJsonResponse(writer http.ResponseWriter, err error, payload interface{}
 
 	sendResponse(writer, http.StatusOK, payload)
 }
+
+func handleUnsupportedRoute(w http.ResponseWriter, r *http.Request) {
+	log.Printf("[WARN] undhandled route: %v %v", r.Method, r.URL.Path)
+	payload := ErrorMsg{Error: false, Msg: UNHANDLED_ROUTE}
+	sendResponse(w, http.StatusBadRequest, payload)
+}
