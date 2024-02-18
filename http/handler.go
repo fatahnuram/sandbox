@@ -74,12 +74,16 @@ func handleEmployees(resp http.ResponseWriter, req *http.Request) {
 func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 	path := parsePathParameter(req.URL.Path)
 	if len(path) == 1 {
-		log.Println("list departments")
-		depts, err := model.ListAllDepartments()
-		wrapJsonResponse(resp, err, depts)
-	} else {
-		log.Println("get department by ID")
+		switch req.Method {
+		case http.MethodGet:
+			log.Println("list departments")
+			depts, err := model.ListAllDepartments()
+			wrapJsonResponse(resp, err, depts)
 
+		default:
+			handleUnsupportedRoute(resp, req)
+		}
+	} else {
 		param := path[1]
 		id, err := strconv.Atoi(param)
 		if err != nil {
@@ -90,7 +94,33 @@ func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 		}
 		id64 := int64(id)
 
-		dep, err := model.GetDepartmentById(id64)
-		wrapJsonResponse(resp, err, dep)
+		switch req.Method {
+		case http.MethodGet:
+			log.Println("get department by ID")
+			dep, err := model.GetDepartmentById(id64)
+			wrapJsonResponse(resp, err, dep)
+
+		case http.MethodDelete:
+			log.Println("delete department by ID")
+			rows, err := model.DeleteDepartmentById(id64)
+			if err != nil {
+				log.Printf("[ERROR] server resp: %v", err)
+				msg := ErrorMsg{Error: true, Msg: SOMETHING_WENT_WRONG}
+				sendResponse(resp, http.StatusInternalServerError, msg)
+				return
+			}
+			if rows == 0 {
+				log.Print("[WARN] not found")
+				msg := ErrorMsg{Error: false, Msg: NOT_FOUND}
+				sendResponse(resp, http.StatusNotFound, msg)
+				return
+			}
+			msg := MsgPlaceholder{Msg: RESOURCE_DELETED}
+			sendResponse(resp, http.StatusOK, msg)
+
+		default:
+			handleUnsupportedRoute(resp, req)
+		}
+
 	}
 }

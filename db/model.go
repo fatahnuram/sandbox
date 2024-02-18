@@ -82,6 +82,19 @@ func updateEmployeeNameById(db *sqlx.DB, id int64, name string) {
 	db.MustExec("update employee set name = ? where id = ?", name, id)
 }
 
+func DeleteDepartmentById(id int64) (int64, error) {
+	db, err := GetDBConnection()
+	if err != nil {
+		return -1, err
+	}
+	result := db.MustExec("delete from department where id = ?", id)
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return -1, err
+	}
+	return rows, nil
+}
+
 func deleteAndReturnDepartmentById(id int64) (Department, error) {
 	dep, err := GetDepartmentById(id)
 	if err != nil {
