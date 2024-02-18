@@ -8,12 +8,10 @@ import (
 )
 
 func homepage(resp http.ResponseWriter, req *http.Request) {
-	// TODO: create test
 	resp.Write([]byte("Welcome.\n"))
 }
 
 func healthz(resp http.ResponseWriter, req *http.Request) {
-	// TODO: create test
 	resp.Write([]byte("ok\n"))
 }
 

@@ -48,3 +48,9 @@ Run the app:
 ```bash
 ./sandbox
 ```
+
+## Run the test
+
+```bash
+go test ./... -v
+```
