@@ -1,6 +1,7 @@
 package http
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,6 +10,11 @@ import (
 
 type MsgPlaceholder struct {
 	Msg string
+}
+
+type ErrorMsg struct {
+	Error bool
+	Msg   string
 }
 
 func parsePathParameter(path string) []string {
@@ -39,20 +45,36 @@ func parsePathParameter(path string) []string {
 	return s
 }
 
-func wrapJsonResponse(writer http.ResponseWriter, err error, payload ...interface{}) {
+func sendResponse(writer http.ResponseWriter, statuscode int, payload interface{}) {
+	writer.Header().Set("content-type", "application/json")
+	payloadbytes, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("[ERROR] %v", err)
+		log.Printf("[ERROR] json marshal: %v", err)
 		writer.WriteHeader(http.StatusInternalServerError)
+		writer.Header().Set("content-type", "text/plain; charset=utf-8")
 		writer.Write([]byte(SOMETHING_WENT_WRONG))
 	} else {
-		payloadbytes, err := json.Marshal(payload)
-		if err != nil {
-			log.Printf("[ERROR] %v", err)
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte(SOMETHING_WENT_WRONG))
-		} else {
-			writer.Header().Set("content-type", "application/json")
-			writer.Write([]byte(payloadbytes))
-		}
+		writer.WriteHeader(statuscode)
+		writer.Write([]byte(payloadbytes))
 	}
+}
+
+func wrapJsonResponse(writer http.ResponseWriter, err error, payload interface{}) {
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// no resources found
+			log.Print("[WARN] not found")
+			msg := ErrorMsg{Error: false, Msg: NOT_FOUND}
+			sendResponse(writer, http.StatusNotFound, msg)
+			return
+		}
+
+		// any unhandled errors
+		log.Printf("[ERROR] server resp: %v", err)
+		msg := ErrorMsg{Error: true, Msg: SOMETHING_WENT_WRONG}
+		sendResponse(writer, http.StatusInternalServerError, msg)
+		return
+	}
+
+	sendResponse(writer, http.StatusOK, payload)
 }

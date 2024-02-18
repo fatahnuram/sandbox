@@ -44,12 +44,18 @@ func InsertEmployeeAndReturnId(db *sqlx.DB, empl Employee) (int64, error) {
 	return id, nil
 }
 
-func getDepartmentById(db *sqlx.DB, id int64) (Department, error) {
-	var dep Department
-	err := db.Get(&dep, "select * from department where id = ?", id)
+func GetDepartmentById(id int64) (Department, error) {
+	db, err := GetDBConnection()
 	if err != nil {
 		return Department{}, err
 	}
+
+	var dep Department
+	err = db.Get(&dep, "select * from department where id = ?", id)
+	if err != nil {
+		return Department{}, err
+	}
+
 	return dep, nil
 }
 
@@ -70,10 +76,14 @@ func updateEmployeeNameById(db *sqlx.DB, id int64, name string) {
 	db.MustExec("update employee set name = ? where id = ?", name, id)
 }
 
-func deleteAndReturnDepartmentById(db *sqlx.DB, id int64) (Department, error) {
-	dep, err := getDepartmentById(db, id)
+func deleteAndReturnDepartmentById(id int64) (Department, error) {
+	dep, err := GetDepartmentById(id)
 	if err != nil {
 		return Department{}, err
+	}
+	db, err := GetDBConnection()
+	if err != nil {
+		return Department{}, nil
 	}
 	db.MustExec("delete from department where id = ?", id)
 	return dep, nil
