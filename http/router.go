@@ -6,9 +6,9 @@ import (
 
 func InitRoutes() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", homepage)
+	mux.Handle("/", notFoundHandler())
 	mux.HandleFunc("/healthz", healthz)
 	mux.HandleFunc("/employees/", handleEmployees)
 	mux.HandleFunc("/departments/", handleDepartments)
-	return mux
+	return withLogging(mux)
 }
