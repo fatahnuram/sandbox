@@ -27,7 +27,9 @@ func parsePathParameter(path string) []string {
 	// remove slash at the beginning of path
 	// e.g. /departments/123
 	chars := strings.Split(path, "")
-	chars = chars[1:]
+	if chars[0] == "/" {
+		chars = chars[1:]
+	}
 
 	// remove trailing slash
 	last := chars[len(chars)-1:]

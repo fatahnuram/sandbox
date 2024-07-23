@@ -8,13 +8,6 @@ import (
 	model "github.com/fatahnuram/sandbox/db"
 )
 
-func notFoundHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("404 not found.\n"))
-	})
-}
-
 func homepage(resp http.ResponseWriter, _ *http.Request) {
 	resp.Write([]byte("Welcome.\n"))
 }

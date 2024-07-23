@@ -18,10 +18,16 @@ func TestParsePathParameter(t *testing.T) {
 		{name: "root, no trailing", path: "", want: []string{}},
 		{name: "department, trailing", path: "/departments/", want: []string{"departments"}},
 		{name: "department, no trailing", path: "/departments", want: []string{"departments"}},
+		{name: "department, no trailing, no start", path: "departments", want: []string{"departments"}},
+		{name: "department, no start", path: "departments/", want: []string{"departments"}},
 		{name: "department id, trailing", path: "/departments/123/", want: []string{"departments", "123"}},
 		{name: "department id, no trailing", path: "/departments/123", want: []string{"departments", "123"}},
+		{name: "department id, no trailing, no start", path: "departments/123", want: []string{"departments", "123"}},
+		{name: "department id, no start", path: "departments/123/", want: []string{"departments", "123"}},
 		{name: "random, trailing", path: "/abce/def/gh/jklm/", want: []string{"abce", "def", "gh", "jklm"}},
 		{name: "random, no trailing", path: "/abce/def/gh/jklm", want: []string{"abce", "def", "gh", "jklm"}},
+		{name: "random, no trailing, no start", path: "abce/def/gh/jklm", want: []string{"abce", "def", "gh", "jklm"}},
+		{name: "random, no start", path: "abce/def/gh/jklm/", want: []string{"abce", "def", "gh", "jklm"}},
 	}
 
 	for _, suite := range suites {
