@@ -6,7 +6,7 @@ import (
 
 func InitRoutes() http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/", notFoundHandler())
+	mux.HandleFunc("/", homepage)
 	mux.HandleFunc("/healthz", healthz)
 	mux.HandleFunc("/employees/", handleEmployees)
 	mux.HandleFunc("/departments/", handleDepartments)
