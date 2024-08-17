@@ -1,8 +1,8 @@
 package http
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,10 +16,20 @@ func TestRouterGet(t *testing.T) {
 		Name       string
 		Url        string
 		WantStatus int
-		WantBody   string
+		WantBody   MsgPlaceholder
 	}{
-		{Name: "get root", Url: fmt.Sprintf("%v/", srv.URL), WantStatus: http.StatusOK, WantBody: "Welcome.\n"},
-		{Name: "get healthz", Url: fmt.Sprintf("%v/healthz", srv.URL), WantStatus: http.StatusOK, WantBody: "ok\n"},
+		{
+			Name:       "get root",
+			Url:        fmt.Sprintf("%v/", srv.URL),
+			WantStatus: http.StatusOK,
+			WantBody:   MsgPlaceholder{Msg: "Welcome."},
+		},
+		{
+			Name:       "get healthz",
+			Url:        fmt.Sprintf("%v/healthz", srv.URL),
+			WantStatus: http.StatusOK,
+			WantBody:   MsgPlaceholder{Msg: "ok"},
+		},
 	}
 
 	for _, suite := range suites {
@@ -33,15 +43,14 @@ func TestRouterGet(t *testing.T) {
 				t.Errorf("resp status not match, want: %v, got: %v", suite.WantStatus, resp.StatusCode)
 			}
 
-			buff, err := io.ReadAll(resp.Body)
+			var body MsgPlaceholder
+			err = json.NewDecoder(resp.Body).Decode(&body)
 			if err != nil {
-				t.Fatalf("failed to read body: %v", err)
+				t.Fatalf("failed to decode body: %v", err)
 			}
-			defer resp.Body.Close()
 
-			body := string(buff)
-			if body != suite.WantBody {
-				t.Errorf("incorrect resp body, want: %v, got: %v", suite.WantBody, body)
+			if body.Msg != suite.WantBody.Msg {
+				t.Errorf("incorrect resp body, want: %v, got: %v", suite.WantBody.Msg, body.Msg)
 			}
 		})
 	}

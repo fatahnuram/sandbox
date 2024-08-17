@@ -10,11 +10,13 @@ import (
 )
 
 func homepage(resp http.ResponseWriter, _ *http.Request) {
-	resp.Write([]byte("Welcome.\n"))
+	msg := MsgPlaceholder{Msg: "Welcome."}
+	sendResponse(resp, http.StatusOK, msg)
 }
 
 func healthz(resp http.ResponseWriter, _ *http.Request) {
-	resp.Write([]byte("ok\n"))
+	msg := MsgPlaceholder{Msg: "ok"}
+	sendResponse(resp, http.StatusOK, msg)
 }
 
 // handleEmployees handle employees CRUD based on request method and path

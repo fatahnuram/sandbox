@@ -1,14 +1,14 @@
 package http
 
 import (
-	"io"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestHomepage(t *testing.T) {
-	wantBody := "Welcome.\n"
+	wantBody := MsgPlaceholder{Msg: "Welcome."}
 	wantStatus := http.StatusOK
 
 	rec := httptest.NewRecorder()
@@ -22,20 +22,20 @@ func TestHomepage(t *testing.T) {
 	if rec.Result().StatusCode != wantStatus {
 		t.Errorf("resp status not OK, want: %v, got: %v", wantStatus, rec.Result().StatusCode)
 	}
-	buffbody, err := io.ReadAll(rec.Result().Body)
-	if err != nil {
-		t.Fatalf("failed to read response body: %v\n", err)
-	}
-	defer rec.Result().Body.Close()
 
-	respBodyString := string(buffbody)
-	if respBodyString != wantBody {
-		t.Errorf("incorrect resp body, want: %v, got: %v", wantBody, respBodyString)
+	var msg MsgPlaceholder
+	err = json.NewDecoder(rec.Result().Body).Decode(&msg)
+	if err != nil {
+		t.Fatalf("failed to decode body: %v\n", err)
+	}
+
+	if msg.Msg != wantBody.Msg {
+		t.Errorf("incorrect resp body, want: %v, got: %v", wantBody.Msg, msg.Msg)
 	}
 }
 
 func TestHealthz(t *testing.T) {
-	wantBody := "ok\n"
+	wantBody := MsgPlaceholder{Msg: "ok"}
 	wantStatus := http.StatusOK
 
 	rec := httptest.NewRecorder()
@@ -51,14 +51,13 @@ func TestHealthz(t *testing.T) {
 		t.Errorf("resp status not OK, want: %v, got: %v", wantStatus, resp.StatusCode)
 	}
 
-	buffbody, err := io.ReadAll(resp.Body)
+	var msg MsgPlaceholder
+	err = json.NewDecoder(resp.Body).Decode(&msg)
 	if err != nil {
-		t.Fatalf("failed to read response body: %v\n", err)
+		t.Fatalf("failed to decode body: %v\n", err)
 	}
-	defer resp.Body.Close()
 
-	body := string(buffbody)
-	if body != wantBody {
-		t.Errorf("incorrect resp body, want: %v, got: %v", wantBody, body)
+	if msg.Msg != wantBody.Msg {
+		t.Errorf("incorrect resp body, want: %v, got: %v", wantBody.Msg, msg.Msg)
 	}
 }
