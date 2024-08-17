@@ -25,7 +25,7 @@ func handleEmployees(resp http.ResponseWriter, req *http.Request) {
 		case http.MethodGet:
 			log.Println("list employees")
 			employees, err := model.ListAllEmployees()
-			wrapJsonResponse(resp, err, employees)
+			wrapJsonResponseFromDB(resp, err, employees)
 
 		default:
 			handleUnsupportedRoute(resp, req)
@@ -45,7 +45,7 @@ func handleEmployees(resp http.ResponseWriter, req *http.Request) {
 		case http.MethodGet:
 			log.Println("get employee by ID")
 			empl, err := model.GetEmployeeById(id64)
-			wrapJsonResponse(resp, err, empl)
+			wrapJsonResponseFromDB(resp, err, empl)
 
 		case http.MethodDelete:
 			log.Println("delete employee by ID")
@@ -79,17 +79,14 @@ func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 		case http.MethodGet:
 			log.Println("list departments")
 			depts, err := model.ListAllDepartments()
-			wrapJsonResponse(resp, err, depts)
+			wrapJsonResponseFromDB(resp, err, depts)
 
 		case http.MethodPost:
 			log.Println("create department")
+			// TODO: implement real create dept
 			var d model.Department
 			err := json.NewDecoder(req.Body).Decode(&d)
-			if err != nil {
-				wrapJsonResponse(resp, err, nil)
-			}
-			log.Printf("dept: %v", d)
-			wrapJsonResponse(resp, nil, d)
+			wrapJsonResponseFromDB(resp, err, d)
 
 		default:
 			handleUnsupportedRoute(resp, req)
@@ -109,7 +106,7 @@ func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 		case http.MethodGet:
 			log.Println("get department by ID")
 			dep, err := model.GetDepartmentById(id64)
-			wrapJsonResponse(resp, err, dep)
+			wrapJsonResponseFromDB(resp, err, dep)
 
 		case http.MethodDelete:
 			log.Println("delete department by ID")

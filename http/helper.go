@@ -66,7 +66,7 @@ func sendResponse(writer http.ResponseWriter, statuscode int, payload interface{
 	}
 }
 
-func wrapJsonResponse(writer http.ResponseWriter, err error, payload interface{}) {
+func wrapJsonResponseFromDB(writer http.ResponseWriter, err error, payload interface{}) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// no resources found
