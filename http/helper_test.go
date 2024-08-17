@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -83,16 +82,10 @@ func TestUnhandledRoute(t *testing.T) {
 				t.Errorf("status code mismatch, want: %v, got: %v", suite.WantStatus, resp.StatusCode)
 			}
 
-			buffbody, err := io.ReadAll(resp.Body)
-			if err != nil {
-				t.Fatalf("failed to read http body: %v", err)
-			}
-			defer resp.Body.Close()
-
 			msg := ErrorMsg{}
-			err = json.Unmarshal(buffbody, &msg)
+			err = json.NewDecoder(resp.Body).Decode(&msg)
 			if err != nil {
-				t.Fatalf("failed to unmarshal json body: %v", err)
+				t.Fatalf("failed to decode body: %v", err)
 			}
 
 			if msg.Error != suite.WantBody.Error {
