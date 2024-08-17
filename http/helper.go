@@ -49,15 +49,20 @@ func parsePathParameter(path string) []string {
 
 func sendResponse(writer http.ResponseWriter, statuscode int, payload interface{}) {
 	writer.Header().Set("content-type", "application/json")
-	payloadbytes, err := json.Marshal(payload)
+
+	_, ok := payload.(error)
+	if ok {
+		e := ErrorMsg{Error: true, Msg: SOMETHING_WENT_WRONG}
+		writer.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(writer).Encode(e)
+		return
+	}
+
+	writer.WriteHeader(statuscode)
+	err := json.NewEncoder(writer).Encode(payload)
 	if err != nil {
 		log.Printf("[ERROR] json marshal: %v", err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Header().Set("content-type", "text/plain; charset=utf-8")
-		writer.Write([]byte(SOMETHING_WENT_WRONG))
-	} else {
-		writer.WriteHeader(statuscode)
-		writer.Write([]byte(payloadbytes))
+		http.Error(writer, SOMETHING_WENT_WRONG, http.StatusInternalServerError)
 	}
 }
 

@@ -56,13 +56,13 @@ func TestUnhandledRoute(t *testing.T) {
 	}{
 		{
 			Name:       "resource",
-			Url:        "/employees/",
+			Url:        "/nonexistent/",
 			WantStatus: http.StatusBadRequest,
 			WantBody:   ErrorMsg{Error: false, Msg: UNHANDLED_ROUTE},
 		},
 		{
 			Name:       "resource id",
-			Url:        "/employees/123/",
+			Url:        "/nonexistent/123/",
 			WantStatus: http.StatusBadRequest,
 			WantBody:   ErrorMsg{Error: false, Msg: UNHANDLED_ROUTE},
 		},

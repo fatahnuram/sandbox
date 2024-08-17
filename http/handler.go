@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -80,6 +81,16 @@ func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 			depts, err := model.ListAllDepartments()
 			wrapJsonResponse(resp, err, depts)
 
+		case http.MethodPost:
+			log.Println("create department")
+			var d model.Department
+			err := json.NewDecoder(req.Body).Decode(&d)
+			if err != nil {
+				wrapJsonResponse(resp, err, nil)
+			}
+			log.Printf("dept: %v", d)
+			wrapJsonResponse(resp, nil, d)
+
 		default:
 			handleUnsupportedRoute(resp, req)
 		}
@@ -121,6 +132,5 @@ func handleDepartments(resp http.ResponseWriter, req *http.Request) {
 		default:
 			handleUnsupportedRoute(resp, req)
 		}
-
 	}
 }
